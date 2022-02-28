@@ -1,0 +1,1 @@
+exec output/bin/app 
