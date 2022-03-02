@@ -10,13 +10,13 @@ import (
 
 func Search(c *gin.Context) {
 	word_list := c.QueryArray("word_list")
-	resultSet, err := handler.Search(c, word_list)
+	resultMap, err := handler.Search(c, word_list)
 	if err != nil {
 		log.Fatalf("fail to search, err=%v", err)
 		c.JSON(e.ERROR, e.GetMsg(e.ERROR))
 	}
-	res := map[string][]interface{}{
-		"result": resultSet,
+	res := map[string]interface{}{
+		"result": resultMap,
 	}
 	if err != nil {
 		log.Fatalf("marshal failed, err=%v", err)

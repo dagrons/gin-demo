@@ -31,9 +31,9 @@ func init() {
 	}
 }
 
-func Search(c *gin.Context, words []string) ([]interface{}, error) {
-	resultSet := []interface{}{}
-	var sqlStr = `SELECT title FROM "Notes"`
+func Search(c *gin.Context, words []string) (interface{}, error) {
+	resultMap := make(map[string]string)
+	var sqlStr = `SELECT title, shortid FROM "Notes"`
 	prunedWords := make([]string, 0)
 	for _, word := range words { // avoid sql injection
 		var prunedWord strings.Builder
@@ -60,11 +60,14 @@ func Search(c *gin.Context, words []string) ([]interface{}, error) {
 		return nil, fmt.Errorf("pg query failed, err=%w, sqlStr=%s", err, sqlStr)
 	}
 	for rows.Next() {
-		var elem interface{}
-		if err := rows.Scan(&elem); err != nil { // 反序列化
-			return resultSet, err
+		var (
+			title   string
+			shortId string
+		)
+		if err := rows.Scan(&title, &shortId); err != nil { // 反序列化
+			return resultMap, err
 		}
-		resultSet = append(resultSet, elem)
+		resultMap[title] = shortId
 	}
-	return resultSet, nil
+	return resultMap, nil
 }

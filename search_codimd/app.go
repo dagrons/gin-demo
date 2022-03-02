@@ -26,6 +26,7 @@ func init() {
 
 func main() {
 	defer dal.Pg.Close()
+
 	router := gin.Default()
 	router.GET("/api/search", views.Search)
 

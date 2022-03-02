@@ -5,6 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Search(c *gin.Context, words []string) ([]interface{}, error) {
+func Search(c *gin.Context, words []string) (interface{}, error) {
 	return dal.Search(c, words)
 }
