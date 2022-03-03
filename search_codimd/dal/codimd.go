@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	_ "github.com/dagrons/gin-demo/search_codimd/settings"
+	_ "github.com/dagrons/gin-demo/search_codimd/pkg/settings"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
