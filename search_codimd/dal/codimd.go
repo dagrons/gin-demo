@@ -3,8 +3,10 @@ package dal
 import (
 	"database/sql"
 	"fmt"
+	"path"
 	"strings"
 
+	"github.com/dagrons/gin-demo/search_codimd/pkg/utils"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"gopkg.in/ini.v1"
@@ -14,7 +16,8 @@ var Pg *sql.DB
 
 func init() {
 	var err error
-	cfg, err := ini.Load("conf/db.ini")
+	confDir := utils.GetEnvString("conf_dir", "conf")
+	cfg, err := ini.Load(path.Join(confDir, "db.ini"))
 	if err != nil {
 		panic(err)
 	}

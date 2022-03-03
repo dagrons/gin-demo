@@ -5,11 +5,13 @@ import (
 	"log"
 	"os"
 	"time"
+
+	"github.com/dagrons/gin-demo/search_codimd/pkg/utils"
 )
 
 var (
-	LogSavePath = "output/logs/"
-	LogSaveName = "log"
+	LogSavePath = utils.GetEnvString("conf_dir", "conf/logs")
+	LogSaveName = utils.GetEnvString("log_save_name", "app")
 	LogFileExt  = "log"
 	TimeFormat  = "20060102"
 )
