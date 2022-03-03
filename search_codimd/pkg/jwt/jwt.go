@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/dagrons/gin-demo/search_codimd/pkg/e"
-	"github.com/dagrons/gin-demo/search_codimd/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 var jwtSecret string
 
 func init() {
-	jwtSecret = utils.MustGetEnvString("jwt_secret")
+	jwtSecret = viper.GetString("jwt_secret")
 }
 
 func JWT() gin.HandlerFunc {
