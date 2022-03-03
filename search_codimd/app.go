@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/dagrons/gin-demo/search_codimd/dal"
@@ -21,7 +20,6 @@ func init() {
 		panic(err)
 	}
 	port = serverCfg.Section("server").Key("port").MustInt()
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
 func main() {
