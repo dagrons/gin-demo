@@ -3,31 +3,28 @@ package dal
 import (
 	"database/sql"
 	"fmt"
-	"path"
 	"strings"
 
-	"github.com/dagrons/gin-demo/search_codimd/pkg/utils"
+	_ "github.com/dagrons/gin-demo/search_codimd/settings"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
-	"gopkg.in/ini.v1"
+	"github.com/spf13/viper"
 )
 
 var Pg *sql.DB
 
 func init() {
 	var err error
-	confDir := utils.GetEnvString("conf_dir", "conf")
-	cfg, err := ini.Load(path.Join(confDir, "db.ini"))
+	pgCfg := viper.GetStringMapString("postgres")
 	if err != nil {
 		panic(err)
 	}
-	pgSection := cfg.Section("postgres")
 	pg_conf_string := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s",
-		pgSection.Key("hostname"),
-		pgSection.Key("username"),
-		pgSection.Key("password"),
-		pgSection.Key("dbname"),
-		pgSection.Key("sslmode"))
+		pgCfg["hostname"],
+		pgCfg["username"],
+		pgCfg["password"],
+		pgCfg["dbname"],
+		pgCfg["sslmode"])
 	Pg, err = sql.Open("postgres", pg_conf_string)
 	if err != nil {
 		panic(err)

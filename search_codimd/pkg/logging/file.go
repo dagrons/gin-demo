@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"time"
 
-	"github.com/dagrons/gin-demo/search_codimd/pkg/utils"
+	"github.com/spf13/viper"
 )
 
 var (
-	LogSavePath = utils.GetEnvString("conf_dir", "conf/logs")
-	LogSaveName = utils.GetEnvString("log_save_name", "app")
+	LogSavePath = viper.GetString("logs.log_dir")
+	LogSaveName = viper.GetString("logs.log_save_name")
 	LogFileExt  = "log"
 	TimeFormat  = "20060102"
 )
@@ -44,7 +45,7 @@ func openLogFile(filePath string) *os.File {
 
 func mkDir() {
 	dir, _ := os.Getwd()
-	err := os.MkdirAll(dir+"/"+getLogFilePath(), os.ModePerm)
+	err := os.MkdirAll(path.Join(dir, getLogFilePath()), os.ModePerm)
 	if err != nil {
 		panic(err)
 	}

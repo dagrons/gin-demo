@@ -1,0 +1,14 @@
+{
+    "http_port": 8078,
+    "postgres": {
+        "hostname": "10.112.108.112",
+        "username": "codimd",
+        "password": "change_password",
+        "dbname": "codimd",
+        "sslmode": "disable"
+    },
+    "logs": {
+        "log_dir": "output/logs/",
+        "log_save_name": "search_codimd"
+    }
+}
