@@ -14,7 +14,7 @@ type LFUCache struct {
 }
 
 func Constructor(cap int) LFUCache {
-	return LFUCache{map[int]*list.Element{}, map[int]*list.List{}, cap, 1}
+	return LFUCache{map[int]*list.Element{}, map[int]*list.List{}, cap, 0}
 }
 
 func (l *LFUCache) Get(k int) int {
@@ -24,16 +24,15 @@ func (l *LFUCache) Get(k int) int {
 	}
 	// 存在，上升到上一级列表
 	v := e.Value.(*PIII)
-	el := l.ListMap[v.F]
-	el.Remove(e)
-	if el.Len() == 0 && l.Min == v.F {
-		l.Min++
-	}
+	l.ListMap[v.F].Remove(e)
 	v.F++
 	if _, ok := l.ListMap[v.F]; !ok {
 		l.ListMap[v.F] = list.New()
 	}
 	l.ListMap[v.F].PushBack(v)
+	if l.Min == v.F-1 && l.ListMap[v.F-1].Len() == 0 {
+		l.Min++
+	}
 	return v.V
 }
 
@@ -49,11 +48,11 @@ func (l *LFUCache) Put(key, val int) {
 	} // 还不存在，首先判断容量，再创建并加入
 	if len(l.Map) == l.Cap {
 		e := l.ListMap[l.Min].Front()
-		l.ListMap[l.Min].Remove(e)
 		delete(l.Map, e.Value.(*PIII).K)
+		l.ListMap[l.Min].Remove(e)
 	}
 	l.Min = 1
-	nv := &PIII{key, val, 1}
+	nv := &PIII{key, val, 1} // new value
 	if _, ok := l.ListMap[1]; !ok {
 		l.ListMap[1] = list.New()
 	}
