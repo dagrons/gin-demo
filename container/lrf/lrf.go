@@ -29,7 +29,7 @@ func (l *LFUCache) Get(k int) int {
 	if _, ok := l.ListMap[v.F]; !ok {
 		l.ListMap[v.F] = list.New()
 	}
-	l.ListMap[v.F].PushBack(v)
+	l.Map[k] = l.ListMap[v.F].PushBack(v)
 	if l.Min == v.F-1 && l.ListMap[v.F-1].Len() == 0 {
 		l.Min++
 	}
