@@ -17,7 +17,21 @@ type LFUCache struct {
 
 func (l *LFUCache) Get(k int) int {
 	if e, ok := l.Map[k]; ok {
-		return e.Value.(Pair).V
+		v := e.Value.(Pair)
+		l.ListMap[v.F].Remove(e)
+		if l.ListMap[v.F].Len() == 0 {
+			delete(l.ListMap, v.F)
+			if l.Min == v.F {
+				l.Min++
+			}
+		}
+		v.F++
+		el, ok := l.ListMap[v.F]
+		if !ok {
+			l.ListMap[v.F] = list.New()
+		}
+		el.PushFront(v)
+		return v.V
 	}
 	return -1
 }
