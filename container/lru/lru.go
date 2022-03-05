@@ -1,11 +1,12 @@
 package lru
 
-import "container/list"
+import (
+	"container/list"
+)
 
 type Pair struct {
 	K, V int
 }
-
 type LRUCache struct {
 	Map  map[int]*list.Element
 	List *list.List
@@ -14,7 +15,6 @@ type LRUCache struct {
 
 func Constructor(cap int) LRUCache {
 	return LRUCache{map[int]*list.Element{}, list.New(), cap}
-
 }
 
 func (l *LRUCache) Get(k int) int {
