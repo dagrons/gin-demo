@@ -2,22 +2,27 @@ package lru
 
 import (
 	"container/list"
+	"sync"
 )
 
 type Pair struct {
-	K, V int
+	K string
+	V interface{}
 }
 type LRUCache struct {
-	Map  map[int]*list.Element
+	Map  map[string]*list.Element
 	List *list.List
 	Cap  int
+	Lock *sync.RWMutex
 }
 
-func Constructor(cap int) LRUCache {
-	return LRUCache{map[int]*list.Element{}, list.New(), cap}
+func New(cap int) *LRUCache {
+	return &LRUCache{map[string]*list.Element{}, list.New(), cap, &sync.RWMutex{}}
 }
 
-func (l *LRUCache) Get(k int) int {
+func (l *LRUCache) Get(k string) interface{} {
+	l.Lock.Lock()
+	defer l.Lock.Unlock()
 	if e, ok := l.Map[k]; ok {
 		l.List.MoveToFront(e)
 		return e.Value.(Pair).V
@@ -25,7 +30,9 @@ func (l *LRUCache) Get(k int) int {
 	return -1
 }
 
-func (l *LRUCache) Put(k, v int) {
+func (l *LRUCache) Put(k string, v interface{}) {
+	l.Lock.Lock()
+	defer l.Lock.Unlock()
 	if e, ok := l.Map[k]; ok {
 		e.Value = Pair{k, v}
 		l.List.MoveToFront(e)

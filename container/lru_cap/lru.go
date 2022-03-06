@@ -42,7 +42,7 @@ func (l *LRUCache) Len() int {
 	return totalNum
 }
 
-func New(cap int) *LRUCache {
+func New(cap int, sizeMove, sizeDelete int) *LRUCache {
 	l := &LRUCache{}
 	l.Buckets = make([]*LRUBucket, 256)
 	for i := 0; i < 256; i++ {
@@ -53,8 +53,8 @@ func New(cap int) *LRUCache {
 	}
 	l.List = list.New()
 	l.Cap = cap
-	l.movePairs = make(chan *list.Element, 10)
-	l.deletePairs = make(chan struct{}, 10)
+	l.movePairs = make(chan *list.Element, sizeMove)
+	l.deletePairs = make(chan struct{}, sizeDelete)
 	go l.worker() // 将链表相关操作解耦，独立线程处理
 	return l
 }
@@ -118,7 +118,7 @@ func (l *LRUCache) worker() { // 事件驱动
 					l.Buckets[shardKeyBackNode].Lock.Unlock()
 					select {
 					case l.deletePairs <- struct{}{}:
-					default:
+					default: // deletePairs is full
 						<-l.deletePairs
 						l.List.Remove(l.List.Back())
 					}
@@ -130,4 +130,8 @@ func (l *LRUCache) worker() { // 事件驱动
 			l.List.Remove(l.List.Back())
 		}
 	}
+}
+
+func (l *LRUCache) Done() bool {
+	return len(l.movePairs) == 0 && len(l.deletePairs) == 0
 }

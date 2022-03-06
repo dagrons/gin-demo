@@ -1,48 +1,64 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"runtime/pprof"
 	"strconv"
+	"sync/atomic"
 	"time"
 
-	"github.com/dagrons/gin-demo/container/lru_cap"
+	"github.com/dagrons/gin-demo/container/lru"
 )
 
 func main() { // 压力测试
-	cpufile, err := os.Create("cpu.prof")
+	startTime := time.Now()
+	sizeMove, sizeDel := 1, 1
+	l := lru.New(10000) // cap = 1000
+	cpufile, err := os.Create("cpu" + fmt.Sprintf("size_move_%d_size_del_%d", sizeMove, sizeDel) + ".prof")
 	if err != nil {
 		return
 	}
-	memfile, err := os.Create("mem.prof")
+	memfile, err := os.Create("mem.prof" + fmt.Sprintf("size_move_%d_size_del_%d", sizeMove, sizeDel) + ".prof")
 	if err != nil {
 		return
 	}
+	cnt := []int64{0}
 	pprof.StartCPUProfile(cpufile)
 	pprof.WriteHeapProfile(memfile)
-	l := lru_cap.New(1000) // cap = 1000
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1000000; i++ {
 		go func() { // random write
 			for { // 10000内读写
-				x := rand.Intn(10000)
+				x := rand.Intn(100000)
 				if rand.Intn(2) == 1 {
 					l.Put(strconv.Itoa(x), x)
 				} else {
 					l.Put(strconv.Itoa(x), x+1)
 				}
-				time.Sleep(50 * time.Millisecond)
+				atomic.AddInt64(&cnt[0], 1)
+				if cnt[0] > 10000000 {
+					return
+				}
 			}
 		}()
 
 		go func() { // random read
 			for {
-				x := rand.Intn(10000)
+				x := rand.Intn(100000)
 				l.Get(strconv.Itoa(x))
-				time.Sleep(50 * time.Millisecond)
+				atomic.AddInt64(&cnt[0], 1)
+				if cnt[0] > 10000000 {
+					return
+				}
 			}
 		}()
 	}
-	time.Sleep(20 * time.Second)
-	pprof.StopCPUProfile()
+	for {
+		if cnt[0] > 10000000 {
+			pprof.StopCPUProfile()
+			fmt.Printf("cost time=%v\n", time.Since(startTime))
+			return
+		}
+	}
 }

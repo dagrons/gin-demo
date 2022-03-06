@@ -1,3 +1,9 @@
 exp/*
 
 !exp/.gitkeep
+
+*.prof
+
+cmd/lru_test/*
+
+!cmd/lru_test/*.go

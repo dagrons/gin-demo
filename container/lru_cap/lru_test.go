@@ -8,7 +8,7 @@ import (
 )
 
 func TestLRU(t *testing.T) { // 正确性测试
-	lru := New(2)
+	lru := New(2, 256, 256)
 	lru.Put("1", 2)
 	time.Sleep(100 * time.Millisecond)
 	if lru.Get("2") != -1 {
@@ -34,7 +34,7 @@ func TestLRU(t *testing.T) { // 正确性测试
 }
 
 func BenchmarkLRU(b *testing.B) { // 压力测试
-	l := New(1000) // cap = 1000
+	l := New(1000, 256, 256) // cap = 1000
 	for i := 0; i < 100000; i++ {
 		x := rand.Intn(100000)
 		if rand.Intn(2) == 1 {
