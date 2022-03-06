@@ -22,7 +22,7 @@ const (
 )
 
 type LRUBucket struct {
-	Lock sync.RWMutex
+	Lock *sync.RWMutex
 	Map  map[string]*list.Element
 }
 
@@ -47,7 +47,7 @@ func New(cap int) *LRUCache {
 	l.Buckets = make([]*LRUBucket, 256)
 	for i := 0; i < 256; i++ {
 		l.Buckets[i] = &LRUBucket{
-			sync.RWMutex{},
+			&sync.RWMutex{},
 			map[string]*list.Element{},
 		}
 	}
@@ -70,15 +70,10 @@ func getBucketIdx(key string) int {
 }
 
 func (l *LRUCache) Get(key string) interface{} {
-	hasher := sha256.New()
-	hasher.Write([]byte(key))
-	shardKey, err := strconv.ParseInt(fmt.Sprintf("%x", hasher.Sum(nil))[0:2], 16, 0)
-	if err != nil {
-		return -1
-	}
+	shardKey := getBucketIdx(key)
 	l.Buckets[shardKey].Lock.RLock() // 读写临界区
-	defer l.Buckets[shardKey].Lock.RUnlock()
 	e, ok := l.Buckets[shardKey].Map[key]
+	l.Buckets[shardKey].Lock.RUnlock()
 	if !ok {
 		return -1
 	}
@@ -88,9 +83,9 @@ func (l *LRUCache) Get(key string) interface{} {
 
 func (l *LRUCache) Put(key string, val interface{}) {
 	shardKey := getBucketIdx(key)
-	l.Buckets[shardKey].Lock.Lock()
-	defer l.Buckets[shardKey].Lock.Unlock()
+	l.Buckets[shardKey].Lock.RLock() // 读写临界区
 	e, ok := l.Buckets[shardKey].Map[key]
+	l.Buckets[shardKey].Lock.RUnlock()
 	if ok {
 		t := e.Value.(Pair)
 		t.V = val
@@ -118,8 +113,15 @@ func (l *LRUCache) worker() { // 事件驱动
 					node := l.List.Back()
 					k := node.Value.(Pair).K
 					shardKeyBackNode := getBucketIdx(k)
+					l.Buckets[shardKeyBackNode].Lock.Lock()
 					delete(l.Buckets[shardKeyBackNode].Map, k)
-					l.deletePairs <- struct{}{}
+					l.Buckets[shardKeyBackNode].Lock.Unlock()
+					select {
+					case l.deletePairs <- struct{}{}:
+					default:
+						<-l.deletePairs
+						l.List.Remove(l.List.Back())
+					}
 				}
 			case MovePair:
 				l.List.MoveToFront(e)
