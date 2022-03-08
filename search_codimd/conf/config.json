@@ -1,5 +1,5 @@
 {
-    "http_port": 8089,
+    "http_port": 3232,
     "postgres": {
         "hostname": "10.112.108.112",
         "username": "codimd",
@@ -10,5 +10,6 @@
     "logs": {
         "log_dir": "output/logs/",
         "log_save_name": "search_codimd"
-    }
+    },
+    "jwt_secret": "try to guess me"
 }

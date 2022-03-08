@@ -29,13 +29,6 @@ const (
 	FATAL
 )
 
-func init() {
-	filePath := getLogFileFullPath()
-	F = openLogFile(filePath)
-
-	logger = log.New(F, DefaultPrefix, log.LstdFlags)
-}
-
 func Debug(format string, v ...interface{}) {
 	setPrefix(DEBUG)
 	logger.Printf(format, v)
@@ -70,4 +63,5 @@ func setPrefix(level Level) {
 	}
 
 	logger.SetPrefix(logPrefix)
+
 }

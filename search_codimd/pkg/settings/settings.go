@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-
+	fmt.Print("-1")
 	pflag.String("conf_dir", "conf", "configuration location")
 	pflag.String("log_dir", "logs", "logs location")
 	pflag.Parse()

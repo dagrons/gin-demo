@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -11,8 +12,22 @@ import (
 
 var jwtSecret string
 
-func init() {
-	jwtSecret = viper.GetString("jwt_secret")
+type option func()
+
+func WithViperConfig() option {
+	return func() {
+		jwtSecret = viper.GetString("jwt_secret")
+		fmt.Print("2,", jwtSecret)
+	}
+}
+func Option(opts ...option) {
+	for _, opt := range opts {
+		opt()
+	}
+}
+
+func Init(opts ...option) {
+	Option(opts...)
 }
 
 func JWT() gin.HandlerFunc {

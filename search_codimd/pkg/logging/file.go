@@ -11,11 +11,34 @@ import (
 )
 
 var (
-	LogSavePath = viper.GetString("logs.log_dir")
-	LogSaveName = viper.GetString("logs.log_save_name")
+	LogSavePath string
+	LogSaveName string
 	LogFileExt  = "log"
 	TimeFormat  = "20060102"
 )
+
+type option func()
+
+func WithViperConfig() option {
+	return func() {
+		LogSavePath = viper.GetString("logs.log_dir")
+		LogSaveName = viper.GetString("logs.log_save_name")
+		fmt.Print("1,", LogSaveName, LogSavePath)
+	}
+}
+
+func Option(opts ...option) {
+	for _, opt := range opts {
+		opt()
+	}
+}
+
+func Init(opts ...option) {
+	Option(opts...)
+	filePath := getLogFileFullPath()
+	F = openLogFile(filePath)
+	logger = log.New(F, DefaultPrefix, log.LstdFlags|log.Llongfile)
+}
 
 func getLogFilePath() string {
 	return fmt.Sprintf("%s", LogSavePath)
