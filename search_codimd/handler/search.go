@@ -9,7 +9,7 @@ import (
 )
 
 func Search(c *gin.Context, words []string) (interface{}, error) {
-	if len(words) == 0 {
+	if len(words) == 0 || len(words[0]) == 0 {
 		return nil, &e.ErrInvalidParam{
 			Param: map[string]interface{}{
 				"words": words,
