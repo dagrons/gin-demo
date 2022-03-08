@@ -23,7 +23,6 @@ func WithViperConfig() option {
 	return func() {
 		LogSavePath = viper.GetString("logs.log_dir")
 		LogSaveName = viper.GetString("logs.log_save_name")
-		fmt.Print("1,", LogSaveName, LogSavePath)
 	}
 }
 

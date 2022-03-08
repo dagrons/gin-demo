@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/dagrons/gin-demo/search_codimd/dal"
-	"github.com/dagrons/gin-demo/search_codimd/pkg/jwt"
+	accesslog "github.com/dagrons/gin-demo/search_codimd/pkg/access_log"
 	"github.com/dagrons/gin-demo/search_codimd/pkg/logging"
 	_ "github.com/dagrons/gin-demo/search_codimd/pkg/settings"
 	"github.com/dagrons/gin-demo/search_codimd/views"
@@ -14,12 +14,18 @@ import (
 )
 
 func main() {
-	logging.Init(logging.WithViperConfig()) // package本身就是个单例，这是个非常重要的思想
-	jwt.Init(jwt.WithViperConfig())         // option function pattern, 也是个很优雅的设计，将闭包函数作为参数传递
-
 	defer dal.Pg.Close()
 
+	// 配置插件
+	dal.Init(dal.WithViperConfig())
+	logging.Init(logging.WithViperConfig())
+
 	router := gin.Default()
+
+	// 配置中间件
+	router.Use(accesslog.Logger(accesslog.WithViperConfig()))
+
+	// 配置路由
 	router.GET("/api/search", views.Search)
 
 	server := &http.Server{

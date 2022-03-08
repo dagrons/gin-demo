@@ -9,7 +9,11 @@
     },
     "logs": {
         "log_dir": "output/logs/",
-        "log_save_name": "search_codimd"
+        "log_save_name": "search_codimd",
+        "access_log": {
+            "path": "output/logs",
+            "name": "access_log"
+        }
     },
     "jwt_secret": "try to guess me"
 }

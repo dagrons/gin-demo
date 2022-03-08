@@ -11,23 +11,37 @@ import (
 	"github.com/spf13/viper"
 )
 
-var Pg *sql.DB
+var (
+	Pg             *sql.DB
+	pg_conf_string string
+)
 
-func init() {
+func Init(opts ...option) {
 	var err error
-	pgCfg := viper.GetStringMapString("postgres")
-	if err != nil {
-		panic(err)
-	}
-	pg_conf_string := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s",
-		pgCfg["hostname"],
-		pgCfg["username"],
-		pgCfg["password"],
-		pgCfg["dbname"],
-		pgCfg["sslmode"])
+	Option(opts...)
 	Pg, err = sql.Open("postgres", pg_conf_string)
 	if err != nil {
-		panic(err)
+		panic("error connect to postgres")
+	}
+}
+
+func WithViperConfig() option {
+	return func() {
+		pgCfg := viper.GetStringMapString("postgres")
+		pg_conf_string = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s",
+			pgCfg["hostname"],
+			pgCfg["username"],
+			pgCfg["password"],
+			pgCfg["dbname"],
+			pgCfg["sslmode"])
+	}
+}
+
+type option func()
+
+func Option(opts ...option) {
+	for _, opt := range opts {
+		opt()
 	}
 }
 
