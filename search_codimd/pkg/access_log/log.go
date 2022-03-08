@@ -33,8 +33,11 @@ func Option(opts ...option) {
 	}
 }
 
-func Logger(opts ...option) gin.HandlerFunc {
+func Init(opts ...option) {
 	Option(opts...)
+}
+
+func Logger() gin.HandlerFunc {
 
 	logClient := logrus.New()
 

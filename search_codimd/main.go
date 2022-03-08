@@ -16,14 +16,15 @@ import (
 func main() {
 	defer dal.Pg.Close()
 
-	// 配置插件
+	// 配置项
 	dal.Init(dal.WithViperConfig())
 	logging.Init(logging.WithViperConfig())
+	accesslog.Init(accesslog.WithViperConfig())
 
 	router := gin.Default()
 
-	// 配置中间件
-	router.Use(accesslog.Logger(accesslog.WithViperConfig()))
+	// 中间件
+	router.Use(accesslog.Logger())
 
 	// 配置路由
 	router.GET("/api/search", views.Search)

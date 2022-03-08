@@ -25,8 +25,11 @@ func Option(opts ...option) {
 	}
 }
 
-func JWT(opts ...option) gin.HandlerFunc {
+func Init(opts ...option) {
 	Option(opts...)
+}
+
+func JWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var code int
 		var data interface{}
