@@ -19,12 +19,11 @@ func main() {
 	// 配置项
 	dal.Init(dal.WithViperConfig())
 	logging.Init(logging.WithViperConfig())
-	accesslog.Init(accesslog.WithViperConfig())
 
 	router := gin.Default()
 
 	// 中间件
-	router.Use(accesslog.Logger())
+	router.Use(accesslog.Logger(accesslog.WithViperConfig()))
 
 	// 配置路由
 	router.GET("/api/search", views.Search)

@@ -9,27 +9,32 @@ import (
 	"github.com/spf13/viper"
 )
 
-var jwtSecret string
+type JwtClient struct {
+	jwtSecret string
+}
 
-type option func()
+type option func(j *JwtClient)
 
 func WithViperConfig() option {
-	return func() {
-		jwtSecret = viper.GetString("jwt_secret")
+	return func(j *JwtClient) {
+		j.jwtSecret = viper.GetString("jwt_secret")
 	}
 }
 
-func Option(opts ...option) {
+func (j *JwtClient) Option(opts ...option) {
 	for _, opt := range opts {
-		opt()
+		opt(j)
 	}
 }
 
-func Init(opts ...option) {
-	Option(opts...)
+func New(opts ...option) *JwtClient {
+	j := &JwtClient{}
+	j.Option(opts...)
+	return j
 }
 
-func JWT() gin.HandlerFunc {
+func JWT(opts ...option) gin.HandlerFunc {
+	j := New(opts...)
 	return func(c *gin.Context) {
 		var code int
 		var data interface{}
@@ -39,7 +44,7 @@ func JWT() gin.HandlerFunc {
 		if token == "" {
 			code = e.INVALID_PARAMS
 		} else {
-			claims, err := ParseToken(token, jwtSecret)
+			claims, err := ParseToken(token, j.jwtSecret)
 			if err != nil {
 				code = e.ERROR_AUTH_CHECK_TOKEN_FAIL
 			} else if time.Now().Unix() > claims.ExpiresAt {

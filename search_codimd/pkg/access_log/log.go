@@ -13,32 +13,34 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
+type LogC struct {
 	apiLogPath string
-	apiLogName string
-)
+	apilogName string
+}
 
-type option func()
+type option func(l *LogC)
 
 func WithViperConfig() option {
-	return func() {
-		apiLogPath = viper.GetString("logs.access_log.path")
-		apiLogName = viper.GetString("logs.access_log.name")
+	return func(l *LogC) {
+		l.apiLogPath = viper.GetString("logs.access_log.path")
+		l.apilogName = viper.GetString("logs.access_log.name")
 	}
 }
 
-func Option(opts ...option) {
+func (l *LogC) Option(opts ...option) {
 	for _, opt := range opts {
-		opt()
+		opt(l)
 	}
 }
 
-func Init(opts ...option) {
-	Option(opts...)
+func New(opts ...option) *LogC {
+	l := &LogC{}
+	l.Option(opts...)
+	return l
 }
 
-func Logger() gin.HandlerFunc {
-
+func Logger(opts ...option) gin.HandlerFunc {
+	l := New(opts...)
 	logClient := logrus.New()
 
 	//禁止logrus的输出
@@ -48,7 +50,7 @@ func Logger() gin.HandlerFunc {
 	}
 	logClient.Out = src
 	logClient.SetLevel(logrus.DebugLevel)
-	apiLogPath := path.Join(apiLogPath, apiLogName)
+	apiLogPath := path.Join(l.apiLogPath, l.apilogName)
 	logWriter, err := rotatelogs.New(
 		apiLogPath+".%Y-%m-%d-%H-%M.log",
 		rotatelogs.WithLinkName(apiLogPath),       // 生成软链，指向最新日志文件
