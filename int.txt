@@ -1,0 +1,19 @@
+2
+rbbbrrrb
+ggggbrbr
+rrrggbrr
+gbrgbrrr
+bgbgrrrg
+bgbgbrrb
+rggrgggg
+bgbrgrgr
+bbrgggggbbgbbbrg
+bbgbrgbgbbgbbbrg
+brgbgbbggbbgbbbr
+gbbgbbbrggrbbgrb
+bgrbbrgggrbrgbrr
+brgbrgbrgrgbrgbr
+brbbrbbbrbrrggrg
+ggrbrgbgbrgggrbr
+1 5 w
+1 4 d
