@@ -1,4 +1,4 @@
-package cmutils
+package cm
 
 import (
 	"fmt"
